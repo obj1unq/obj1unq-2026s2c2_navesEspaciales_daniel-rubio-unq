@@ -1,5 +1,5 @@
 import naves.*
-
+//1. Las naves
 describe "Nave de carga" {
 
 	const naveVacia = new NaveDeCarga()
@@ -25,12 +25,12 @@ describe "Nave de carga" {
 		naveLlena.recibirAmenaza()
 		assert.equals(0, naveLlena.carga())
 	}
-	
+
 	test "acercamiento a control de nave en falta" {
 		naveLlena.acercamientoDeControl()
 		assert.equals(0, naveLlena.carga())
 	}
-	
+
 	test "acercamiento a control de nave en regla" {
 		naveLlena.carga(100)
 		naveLlena.acercamientoDeControl()
@@ -94,4 +94,78 @@ describe "Nave de combate" {
 		naveEnAtaque.recibirAmenaza()
 		assert.equals("Enemigo encontrado", naveEnAtaque.ultimoMensaje())
 	}
+
+}
+
+//2. Propulsión 
+describe "Propulsión de naves" {
+
+	test "una nave de carga sin velocidad queda a 20000 al propulsarse" {
+		const nave = new NaveDeCarga()
+		nave.propulsar()
+		assert.equals(20000, nave.velocidad())
+	}
+
+	test "una nave de pasajeros a 290000 queda a 300000 al propulsarse" {
+		const nave = new NaveDePasajeros(velocidad = 290000)
+		nave.propulsar()
+		assert.equals(300000, nave.velocidad())
+	}
+
+}
+//3. Residuos radioactivos
+describe "Nave de residuos radioactivos" {
+
+	const nave = new NaveDeResiduosRadioactivos(carga = 5000, velocidad = 10000, selladoAlVacio = true)
+
+	test "al recibir una amenaza frena pero conserva su carga" {
+		nave.recibirAmenaza()
+		assert.equals(0, nave.velocidad())
+		assert.equals(5000, nave.carga())
+	}
+
+}
+//4. Preparación para el viaje
+describe "Preparación para el viaje" {
+
+	test "nave de pasajeros a 290000 queda a 300000" {
+		const nave = new NaveDePasajeros(velocidad = 290000)
+		nave.prepararParaViaje()
+		assert.equals(300000, nave.velocidad())
+	}
+
+	test "nave de residuos radioactivos queda a 15000 y sellada al vacío" {
+		const nave = new NaveDeResiduosRadioactivos()
+		nave.prepararParaViaje()
+		assert.equals(15000, nave.velocidad())
+		assert.that(nave.selladoAlVacio())
+	}
+
+	test "nave de combate en ataque emite 'Volviendo a la base'" {
+		const nave = new NaveDeCombate(modo = ataque)
+		nave.prepararParaViaje()
+		assert.equals("Volviendo a la base", nave.ultimoMensaje())
+		assert.equals(15000, nave.velocidad())
+	}
+
+	test "nave de combate en reposo emite 'Saliendo en misión' y pasa a ataque" {
+		const nave = new NaveDeCombate()
+		nave.prepararParaViaje()
+		assert.equals("Saliendo en misión", nave.ultimoMensaje())
+		assert.equals(ataque, nave.modo())
+		assert.equals(15000, nave.velocidad())
+	}
+
+}
+//5. Enfrentar enemigo
+
+describe "Enfrentar enemigo" {
+
+	test "nave de pasajeros sin velocidad queda a 20000 y con alarma activada" {
+		const nave = new NaveDePasajeros()
+		nave.encontrarEnemigo()
+		assert.equals(20000, nave.velocidad())
+		assert.that(nave.alarma())
+	}
+
 }
